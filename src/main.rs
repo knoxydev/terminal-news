@@ -1,11 +1,11 @@
 #![allow(warnings)]
 
-// PACKAGES
-
-
 // MODULES
 mod set_key;
 pub use crate::set_key::api_fn;
+
+mod news_mod;
+pub use crate::news_mod::news_fn;
 
 
 fn main() {
@@ -16,9 +16,8 @@ fn main() {
 	let resp = &resp_old[0..&resp_old.len() - 2];
 
 	if resp == "api_key" { api_fn::set_api_key(); }
-	else if resp == "news" {
-		println!("HELLO");
-	} else {
+	else if resp == "news" { news_fn::show_news(); }
+	else {
 		println!("Incorrect command !");
 		return;
 	}

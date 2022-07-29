@@ -1,10 +1,12 @@
 pub mod api_fn {
 	#![allow(warnings)]
 
+	// PACKAGES
 	use std::path::Path;
 	use std::fs;
 	use std::fs::File;
 	use std::io::prelude::*;
+
 
 	pub fn set_api_key() {
 		let fl_path = String::from("./target/api_key.txt");
@@ -15,6 +17,8 @@ pub mod api_fn {
 		let mut resp_old = String::new();
 		std::io::stdin().read_line(&mut resp_old).expect("Failes");
 		let resp = &resp_old[0..&resp_old.len() - 2];
+
+		if resp == "" { return println!("empty !\n'api_key' do not received !"); }
 
 		if Path::new(&fl_path).exists() == true
 		{
