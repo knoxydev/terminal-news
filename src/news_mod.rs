@@ -13,6 +13,7 @@ pub mod news_fn {
 	use reqwest::{Client, header::USER_AGENT};
 	use serde::Deserialize;
 	use serde_json::Value;
+	use colored::Colorize;
 
 	// MODULES
 	pub use crate::set_key::api_fn;
@@ -49,8 +50,10 @@ pub mod news_fn {
 		let v: Value = serde_json::from_str(&resp)?;
 		let sub_value: Vec<Value> = serde_json::from_str(&v["articles"].to_string())?;
 
+		// std::process::Command::new("cls").status().unwrap();
+
 		for i in &sub_value {
-			println!("{:?}\n", i["title"]);
+			println!("\n├ {}\n│\n├── {}\n├── {}\n├── {}\n└── {}\n\n\n", i["title"], i["description"], i["source"]["name"], format!("{}", i["url"]).bold(), i["publishedAt"]);
 		}
 		
 		Ok(())
