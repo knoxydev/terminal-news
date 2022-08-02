@@ -1,4 +1,8 @@
 {
 	"category" : ["business", "entertainment", "general", "health", "science", "sports", "technology"],
 	"country" : ["ae", "au", "be", "bg", "br", "ch", "cn", "cz", "fr", "gb", "gr", "it", "jp", "kr", "lt", "lv", "ma", "ng", "nl", "ph", "ro", "ru", "sg", "si", "sk", "tw", "ua", "us"]
+	"settings" : {
+		"category" : "default",
+		"country" : "default"
+	}
 }
