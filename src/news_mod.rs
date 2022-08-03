@@ -21,6 +21,7 @@ pub mod news_fn {
 
 	pub fn show_news() {
 		let fl_path = String::from("./target/api_key.txt");
+		print!("\x1B[2J\x1B[1;1H");
 
 		if Path::new(&fl_path).exists() == true {
 			let data = fs::read_to_string(&fl_path).expect("Something went wrong reading the file");
@@ -45,15 +46,15 @@ pub mod news_fn {
 
 		let mut file = File::create("./target/data.json").expect("Error encountered while creating file!");
 		fs::write("./target/data.json", &resp).expect("Unable to write file");
-		
 
 		let v: Value = serde_json::from_str(&resp)?;
 		let sub_value: Vec<Value> = serde_json::from_str(&v["articles"].to_string())?;
 
-		// std::process::Command::new("cls").status().unwrap();
+		let mut news_id: i32 = 1;
 
 		for i in &sub_value {
-			println!("\n├ {}\n│\n├── {}\n├── {}\n├── {}\n└── {}\n\n\n", i["title"], i["description"], i["source"]["name"], format!("{}", i["url"]).bold(), i["publishedAt"]);
+			println!("\n├ {}: {}\n│\n├─ {}\n├─ {}\n├─ {}\n└─ {}\n\n\n", news_id, i["title"].to_string().black().on_white(), i["description"], i["source"]["name"], format!("{}", i["url"]).bold(), i["publishedAt"]);
+			news_id += 1;
 		}
 		
 		Ok(())
