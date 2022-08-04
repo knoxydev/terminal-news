@@ -11,7 +11,7 @@ pub mod news_fn {
 	use std::path::Path;
 
 	use reqwest::{Client, header::USER_AGENT};
-	use serde::Deserialize;
+	use serde::{Deserialize, Serialize};
 	use serde_json::Value;
 	use colored::Colorize;
 
@@ -19,22 +19,37 @@ pub mod news_fn {
 	pub use crate::set_key::api_fn;
 
 
-	pub fn show_news() {
-		let fl_path = String::from("./target/api_key.txt");
-		print!("\x1B[2J\x1B[1;1H");
+	#[derive(Deserialize, Serialize, Debug)]
+	struct Settings {
+		ctg: String,
+		lng: String
+	}
 
-		if Path::new(&fl_path).exists() == true {
-			let data = fs::read_to_string(&fl_path).expect("Something went wrong reading the file");
-			do_request(&data);
-		} else {
-			println!("You didn't insert API key. You need API key to read the news !");
-			return api_fn::set_api_key();
+
+	fn get_settings() -> Settings {
+		let fl_path = String::from("./target/settings.json");
+
+		if Path::new(&fl_path).exists() == false {
+ 			File::create(&fl_path).expect("Error encountered while creating file!");
+
+ 			let obj = Settings { ctg: "all".to_string(), lng: "us".to_string() };
+ 			fs::write(&fl_path, serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
 		}
+
+		let data = fs::read_to_string(&fl_path).expect("wrong 1");
+		return serde_json::from_str(&data.to_string()).expect("wrong 2");
 	}
 
 	#[tokio::main]
-	pub async fn do_request(url: &String) -> Result<(), Box<dyn Error>> {
-		let new_url = format!("https://newsapi.org/v2/top-headlines?country=ru&apiKey={}", url);
+	async fn do_request(url: &String) -> Result<(), Box<dyn Error>> {
+		let stn: Settings = get_settings();
+		let mut new_url = format!("");
+
+		if stn.ctg == "all" {
+			new_url = format!("https://newsapi.org/v2/top-headlines?country={}&apiKey={}", stn.lng, url);
+		} else {
+			new_url = format!("https://newsapi.org/v2/top-headlines?country={}&category={}&apiKey={}", stn.lng, stn.ctg, url);
+		}
 
 		let client = Client::new();
 		let resp = client.get(&new_url)
@@ -58,5 +73,18 @@ pub mod news_fn {
 		}
 		
 		Ok(())
+	}
+
+	pub fn show_news() {
+		let fl_path = String::from("./target/api_key.txt");
+		print!("\x1B[2J\x1B[1;1H");
+
+		if Path::new(&fl_path).exists() == true {
+			let data = fs::read_to_string(&fl_path).expect("Something went wrong reading the file");
+			do_request(&data);
+		} else {
+			println!("You didn't insert API key. You need API key to read the news !");
+			return api_fn::set_api_key();
+		}
 	}
 }

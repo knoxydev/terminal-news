@@ -27,11 +27,11 @@ pub mod stn_fn {
  		fs::write("./target/settings.json", serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
 	}
 
-	fn first_request(data: &mut Structura, stn: &Settings) -> String {
+	fn first_request(data: &Vec<String>, stn: &Settings) -> String {
 		print!("\x1B[2J\x1B[1;1H");
 		println!("Now - {:?}\n", stn.ctg);
-		println!("Categories - {:?}\n", data.category);
-		println!("Select a category from the list or select 'nothing' if you want to receive news from all categories -> ");
+		println!("Categories - {:?}\n", data);
+		println!("Select a category from the list or select 'all' if you want to receive news from all categories -> ");
 
 		let mut resp_old = String::new();
 		std::io::stdin().read_line(&mut resp_old).expect("Failes");
@@ -40,10 +40,10 @@ pub mod stn_fn {
 		return resp.to_string();
 	}
 
-	fn second_request(data: &mut Structura, stn: &Settings) -> String {
+	fn second_request(data: &Vec<String>, stn: &Settings) -> String {
 		print!("\x1B[2J\x1B[1;1H");
 		println!("Now - {:?}\n", stn.lng);
-		println!("Countries - {:?}\n", data.lang);
+		println!("Countries - {:?}\n", data);
 		println!("Select 'country' you want to get news for. You also can select 'nothing' -> ");
 
 		let mut resp_old = String::new();
@@ -56,23 +56,21 @@ pub mod stn_fn {
 	pub fn start() {
 		let fl_path = String::from("./target/settings.json");
 
-		let data = fs::read_to_string("./parameters/settings.json").expect("wrong 1");
-		let mut res: Structura = serde_json::from_str(&data.to_string()).expect("wrong 2");
-
-		//if resp == "" { return println!("empty !\n'api_key' do not received !"); }
-
 		if Path::new(&fl_path).exists() == false {
  			File::create(&fl_path).expect("Error encountered while creating file!");
 
- 			let obj = Settings { ctg: "nothing".to_string(), lng: "nothing".to_string() };
+ 			let obj = Settings { ctg: "all".to_string(), lng: "us".to_string() };
  			fs::write(&fl_path, serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
 		}
+
+		let data = fs::read_to_string("./parameters/settings.json").expect("wrong 1");
+		let mut res: Structura = serde_json::from_str(&data.to_string()).expect("wrong 2");
 
 		let data_two = fs::read_to_string(&fl_path).expect("wrong 1");
 		let mut stn: Settings = serde_json::from_str(&data_two.to_string()).expect("wrong 2");
 
-		let ctg = first_request(&mut res, &stn);
-		let lng = second_request(&mut res, &stn);
+		let ctg = first_request(&res.category, &stn);
+		let lng = second_request(&res.lang, &stn);
 
 		save(ctg, lng);
 	}
