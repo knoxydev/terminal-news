@@ -5,7 +5,6 @@ pub mod news_fn {
 	use tokio::io;
 	use std::fs;
 	use std::fs::File;
-
 	use std::result::Result;
 	use std::error::Error;
 	use std::path::Path;
@@ -22,7 +21,8 @@ pub mod news_fn {
 	#[derive(Deserialize, Serialize, Debug)]
 	struct Settings {
 		ctg: String,
-		lng: String
+		lng: String,
+		zen: String
 	}
 
 
@@ -30,10 +30,10 @@ pub mod news_fn {
 		let fl_path = String::from("./target/settings.json");
 
 		if Path::new(&fl_path).exists() == false {
- 			File::create(&fl_path).expect("Error encountered while creating file!");
+			File::create(&fl_path).expect("Error encountered while creating file!");
 
- 			let obj = Settings { ctg: "all".to_string(), lng: "us".to_string() };
- 			fs::write(&fl_path, serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
+			let obj = Settings { ctg: "all".to_string(), lng: "us".to_string(), zen: "off".to_string() };
+			fs::write(&fl_path, serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
 		}
 
 		let data = fs::read_to_string(&fl_path).expect("wrong 1");
@@ -68,16 +68,22 @@ pub mod news_fn {
 		let mut news_id: i32 = 1;
 
 		for i in &sub_value {
-			println!("\n├ {}: {}\n│\n├─ {}\n├─ {}\n├─ {}\n└─ {}\n\n\n", news_id, i["title"].to_string().black().on_white(), i["description"], i["source"]["name"], format!("{}", i["url"]).bold(), i["publishedAt"]);
+			if &stn.zen == "on" {
+				println!("\n{}: {}\n\n{}\n\n\n", news_id, i["title"], i["url"]);
+			} else {
+				println!("\n├ {}: {}\n│\n├ Description: {}\n├ Source: {}\n├ Url: {}\n└ Date: {}\n\n\n", news_id, i["title"].to_string().black().on_white(), i["description"], i["source"]["name"], format!("{}", i["url"]).bold(), i["publishedAt"]);
+			}
 			news_id += 1;
 		}
+
+		println!("\n--- Terminal News ---\nCategory: {}, Country: {}", stn.ctg, stn.lng);
 		
 		Ok(())
 	}
 
 	pub fn show_news() {
 		let fl_path = String::from("./target/api_key.txt");
-		print!("\x1B[2J\x1B[1;1H");
+		clearscreen::clear().unwrap();
 
 		if Path::new(&fl_path).exists() == true {
 			let data = fs::read_to_string(&fl_path).expect("Something went wrong reading the file");

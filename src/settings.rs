@@ -10,6 +10,9 @@ pub mod stn_fn {
 	use std::fs::File;
 	use std::fs;
 
+	use dialoguer::{Select, theme::ColorfulTheme};
+	use console::Term;
+
 	#[derive(Deserialize, Serialize, Debug)]
 	struct Structura {
 		category: Vec<String>,
@@ -19,48 +22,95 @@ pub mod stn_fn {
 	#[derive(Deserialize, Serialize, Debug)]
 	struct Settings {
 		ctg: String,
-		lng: String
+		lng: String,
+		zen: String
 	}
 
-	fn save(s_ctg: String, s_lng: String) {
-		let obj = Settings { ctg: s_ctg.to_string(), lng: s_lng.to_string() };
- 		fs::write("./target/settings.json", serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
+	fn save(s_ctg: String, s_lng: String, s_zen: String) {
+		let obj = Settings { ctg: s_ctg.to_string(), lng: s_lng.to_string(), zen: s_zen.to_string() };
+		fs::write("./target/settings.json", serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
 	}
 
-	fn first_request(data: &Vec<String>, stn: &Settings) -> String {
-		print!("\x1B[2J\x1B[1;1H");
+	fn first_request(data: &Vec<String>, stn: &Settings) -> Result<String, Box<dyn Error>> {
+		clearscreen::clear().unwrap();
+
 		println!("Now - {:?}\n", stn.ctg);
-		println!("Categories - {:?}\n", data);
-		println!("Select a category from the list or select 'all' if you want to receive news from all categories -> ");
+		println!("Category ->");
 
-		let mut resp_old = String::new();
-		std::io::stdin().read_line(&mut resp_old).expect("Failes");
-		let resp = &resp_old[0..&resp_old.len() - 2];
+		let mut ctg = String::new();
+		let items = &data;
+		let selection = Select::with_theme(&ColorfulTheme::default())
+			.items(&items)
+			.default(0)
+			.interact_on_opt(&Term::stderr())?;
 
-		return resp.to_string();
+		match selection {
+			Some(index) => {
+				ctg = items[index].to_string();
+				println!("User selected item : {}", items[index]);
+			},
+			None => println!("User did not select anything")
+		}
+
+		Ok(ctg)
 	}
 
-	fn second_request(data: &Vec<String>, stn: &Settings) -> String {
-		print!("\x1B[2J\x1B[1;1H");
+	fn second_request(data: &Vec<String>, stn: &Settings) -> Result<String, Box<dyn Error>> {
+		clearscreen::clear().unwrap();
+
 		println!("Now - {:?}\n", stn.lng);
-		println!("Countries - {:?}\n", data);
-		println!("Select 'country' you want to get news for. You also can select 'nothing' -> ");
+		println!("Country ->");
 
-		let mut resp_old = String::new();
-		std::io::stdin().read_line(&mut resp_old).expect("Failes");
-		let resp = &resp_old[0..&resp_old.len() - 2];
+		let mut lng = String::new();
+		let items = &data;
+		let selection = Select::with_theme(&ColorfulTheme::default())
+			.items(&items)
+			.default(0)
+			.interact_on_opt(&Term::stderr())?;
 
-		return resp.to_string();
+		match selection {
+			Some(index) => {
+				lng = items[index].to_string();
+				println!("User selected item : {}", items[index]);
+			},
+			None => println!("User did not select anything")
+		}
+
+		Ok(lng)
+	}
+
+	fn third_request(stn: &Settings) -> Result<String, Box<dyn Error>> {
+		clearscreen::clear().unwrap();
+
+		println!("Now - {:?}\n", stn.zen);
+		println!("Zen Mode:");
+
+		let mut zen = String::new();
+		let items = vec!["ON", "OFF"];
+		let selection = Select::with_theme(&ColorfulTheme::default())
+			.items(&items)
+			.default(0)
+			.interact_on_opt(&Term::stderr())?;
+
+		match selection {
+			Some(index) => {
+				zen = items[index].to_string();
+				println!("User selected item : {}", items[index]);
+			},
+			None => println!("User did not select anything")
+		}
+
+		Ok(zen)
 	}
 	
 	pub fn start() {
 		let fl_path = String::from("./target/settings.json");
 
 		if Path::new(&fl_path).exists() == false {
- 			File::create(&fl_path).expect("Error encountered while creating file!");
+			File::create(&fl_path).expect("Error encountered while creating file!");
 
- 			let obj = Settings { ctg: "all".to_string(), lng: "us".to_string() };
- 			fs::write(&fl_path, serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
+			let obj = Settings { ctg: "all".to_string(), lng: "us".to_string(), zen: "off".to_string() };
+			fs::write(&fl_path, serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
 		}
 
 		let data = fs::read_to_string("./parameters/settings.json").expect("wrong 1");
@@ -69,9 +119,10 @@ pub mod stn_fn {
 		let data_two = fs::read_to_string(&fl_path).expect("wrong 1");
 		let mut stn: Settings = serde_json::from_str(&data_two.to_string()).expect("wrong 2");
 
-		let ctg = first_request(&res.category, &stn);
-		let lng = second_request(&res.lang, &stn);
+		let ctg = first_request(&res.category, &stn).unwrap().to_lowercase();
+		let lng = second_request(&res.lang, &stn).unwrap().to_lowercase();
+		let zen = third_request(&stn).unwrap().to_lowercase();
 
-		save(ctg, lng);
+		save(ctg, lng, zen);
 	}
 }
