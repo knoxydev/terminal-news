@@ -26,9 +26,15 @@ pub mod stn_fn {
 		zen: String
 	}
 
+
+	fn create_folder() -> Result<(), Box<dyn Error>> {
+		fs::create_dir_all("./settings-fld")?;
+		Ok(())
+	}
+
 	fn save(s_ctg: String, s_lng: String, s_zen: String) {
 		let obj = Settings { ctg: s_ctg.to_string(), lng: s_lng.to_string(), zen: s_zen.to_string() };
-		fs::write("./target/settings.json", serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
+		fs::write("./settings-fld/settings.json", serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
 	}
 
 	fn first_request(data: &Vec<String>, stn: &Settings) -> Result<String, Box<dyn Error>> {
@@ -104,7 +110,8 @@ pub mod stn_fn {
 	}
 	
 	pub fn start() {
-		let fl_path = String::from("./target/settings.json");
+		create_folder();
+		let fl_path = String::from("./settings-fld/settings.json");
 
 		if Path::new(&fl_path).exists() == false {
 			File::create(&fl_path).expect("Error encountered while creating file!");
@@ -113,8 +120,10 @@ pub mod stn_fn {
 			fs::write(&fl_path, serde_json::to_string_pretty(&obj).unwrap()).expect("Unable to write file");
 		}
 
-		let data = fs::read_to_string("./parameters/settings.json").expect("wrong 1");
-		let mut res: Structura = serde_json::from_str(&data.to_string()).expect("wrong 2");
+		let res = Structura {
+      category: vec!["all".into(),"business".into(),"entertainment".into(),"general".into(),"health".into(),"science".into(),"sports".into(),"technology".into()],
+      lang: vec!["ae".into(),"au".into(),"be".into(),"bg".into(),"br".into(),"ch".into(),"cn".into(),"cz".into(),"fr".into(),"gb".into(),"gr".into(),"it".into(),"jp".into(),"kr".into(),"lt".into(),"lv".into(),"ma".into(),"ng".into(),"nl".into(),"ph".into(),"ro".into(),"ru".into(),"sg".into(),"si".into(),"sk".into(),"tw".into(),"ua".into(),"us".into()],
+    };
 
 		let data_two = fs::read_to_string(&fl_path).expect("wrong 1");
 		let mut stn: Settings = serde_json::from_str(&data_two.to_string()).expect("wrong 2");

@@ -26,8 +26,13 @@ pub mod news_fn {
 	}
 
 
+	fn create_folder() -> Result<(), Box<dyn Error>> {
+		fs::create_dir_all("./settings-fld")?;
+		Ok(())
+	}
+
 	fn get_settings() -> Settings {
-		let fl_path = String::from("./target/settings.json");
+		let fl_path = String::from("./settings-fld/settings.json");
 
 		if Path::new(&fl_path).exists() == false {
 			File::create(&fl_path).expect("Error encountered while creating file!");
@@ -59,8 +64,8 @@ pub mod news_fn {
 			.text()
 			.await?;
 
-		let mut file = File::create("./target/data.json").expect("Error encountered while creating file!");
-		fs::write("./target/data.json", &resp).expect("Unable to write file");
+		let mut file = File::create("./settings-fld/data.json").expect("Error encountered while creating file!");
+		fs::write("./settings-fld/data.json", &resp).expect("Unable to write file");
 
 		let v: Value = serde_json::from_str(&resp)?;
 		let sub_value: Vec<Value> = serde_json::from_str(&v["articles"].to_string())?;
@@ -82,7 +87,8 @@ pub mod news_fn {
 	}
 
 	pub fn show_news() {
-		let fl_path = String::from("./target/api_key.txt");
+		create_folder();
+		let fl_path = String::from("./settings-fld/api_key.txt");
 		clearscreen::clear().unwrap();
 
 		if Path::new(&fl_path).exists() == true {

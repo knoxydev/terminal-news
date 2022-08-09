@@ -6,10 +6,17 @@ pub mod api_fn {
 	use std::fs;
 	use std::fs::File;
 	use std::io::prelude::*;
+	use std::result::Result;
+	use std::error::Error;
 
+	fn create_folder() -> Result<(), Box<dyn Error>> {
+		fs::create_dir_all("./settings-fld")?;
+		Ok(())
+	}
 
 	pub fn set_api_key() {
-		let fl_path = String::from("./target/api_key.txt");
+		create_folder();
+		let fl_path = String::from("./settings-fld/api_key.txt");
 
 		println!("You can take your API key from -> https://newsapi.org/\n");
 		println!("Enter 'api_key' -> ");

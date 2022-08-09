@@ -11,8 +11,8 @@ mod settings;
 pub use crate::settings::stn_fn;
 
 
-fn main() {
-	println!("Enter 'api_key', 'settings' or 'news' -> ");
+fn input() {
+	println!("Enter 'api_key', 'settings', 'news' or 'clear' -> ");
 
 	let mut resp_old = String::new();
 	std::io::stdin().read_line(&mut resp_old).expect("Failes");
@@ -20,9 +20,16 @@ fn main() {
 
 	if resp == "api_key" { api_fn::set_api_key(); }
 	else if resp == "news" { news_fn::show_news(); }
-	else if resp == "settings" {stn_fn::start(); }
+	else if resp == "settings" { stn_fn::start(); }
+	else if resp == "clear" { clearscreen::clear().unwrap(); }
 	else {
 		println!("Incorrect command !");
 		return;
 	}
+
+	input();
+}
+
+fn main() {
+	input();
 }
