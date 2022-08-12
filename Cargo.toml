@@ -14,3 +14,8 @@ colored = "2.0.0"
 dialoguer = "0.10.2"
 console = "0.15.1"
 clearscreen = "1.0.10"
+
+[profile.release]
+opt-level = "z"
+codegen-units = 1
+panic = "abort"
