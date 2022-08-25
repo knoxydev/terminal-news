@@ -18,13 +18,15 @@ fn input() {
 	std::io::stdin().read_line(&mut resp_old).expect("Failes");
 	let resp = &resp_old[0..&resp_old.len() - 2];
 
-	if resp == "api_key" { api_fn::set_api_key(); }
-	else if resp == "news" { news_fn::show_news(); }
-	else if resp == "settings" { stn_fn::start(); }
-	else if resp == "clear" { clearscreen::clear().unwrap(); }
-	else {
-		println!("Incorrect command !");
-		return;
+	match resp.as_ref() {
+		"api_key" => api_fn::set_api_key(),
+		"news" => news_fn::show_news(),
+		"settings" => stn_fn::start(),
+		"clear" => clearscreen::clear().unwrap(),
+		_ => {
+			println!("Incorrect command !");
+			return;
+		},
 	}
 
 	input();
