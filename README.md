@@ -6,7 +6,7 @@
 
 ## Commands
 - `settings` - command for setting up the news output, and setting Zen mode.
-- `api_key` is a command to insert a special key that is needed to display news.
+- `api_key` - command to insert a special key that is needed to display news.
 - `news` - command to display news in the command line.
 - `clear` - command to clear the command line.
 
