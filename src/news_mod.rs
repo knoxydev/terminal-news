@@ -13,6 +13,7 @@ pub mod news_fn {
 	use serde::{Deserialize, Serialize};
 	use serde_json::Value;
 	use colored::Colorize;
+	use online::check;
 
 	// MODULES
 	pub use crate::set_key::api_fn;
@@ -54,6 +55,11 @@ pub mod news_fn {
 			new_url = format!("https://newsapi.org/v2/top-headlines?country={}&apiKey={}", stn.lng, url);
 		} else {
 			new_url = format!("https://newsapi.org/v2/top-headlines?country={}&category={}&apiKey={}", stn.lng, stn.ctg, url);
+		}
+
+		if check(None).await.is_ok() == false {
+			println!("\n-- Check your internet connection ! --\n");
+			return Ok(());
 		}
 
 		let client = Client::new();
