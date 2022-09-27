@@ -9,6 +9,8 @@
 - `api_key` - command to insert a special key that is needed to display news.
 - `news` - command to display news in the command line.
 - `clear` - command to clear the command line.
+- `about` - command to get information about the project.
+- `exit` - command to exit the program.
 
 ## Usage
 
