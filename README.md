@@ -2,7 +2,7 @@
 
 ### A program for reading news from the command line.
 
-![pic for project](https://github.com/nkr413/terminal-news/blob/main/docs/view.png)
+![pic for project](https://github.com/knoxydev/terminal-news/blob/main/docs/view.png)
 
 ## Commands
 - `settings` - command for setting up the news output, and setting Zen mode.
